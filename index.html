@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Proxy Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: #f4f4f9;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .output {
+            background: #eef;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CORS Proxy URL Generator</h1>
+        <p>Paste your API URL below, and we will generate a proxied URL:</p>
+        <input type="text" id="apiUrl" placeholder="Enter API URL">
+        <button onclick="generateProxyUrl()">Generate Proxy URL</button>
+        <h3>Proxied URL:</h3>
+        <div class="output" id="proxyUrl">Your proxied URL will appear here</div>
+    </div>
+
+    <script>
+        function generateProxyUrl() {
+            const apiUrl = document.getElementById("apiUrl").value.trim();
+            if (!apiUrl) {
+                alert("Please enter a valid API URL");
+                return;
+            }
+            
+            const proxyUrl = `https://proxy.sewakgautam.com.np/api/proxy?url=${apiUrl}`;
+            document.getElementById("proxyUrl").textContent = proxyUrl;
+        }
+    </script>
+</body>
+</html>
