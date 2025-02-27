@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
             padding: 50px;
             background: #f4f4f9;
         }
+
         .container {
             background: white;
             padding: 30px;
@@ -19,6 +21,7 @@
             max-width: 500px;
             margin: auto;
         }
+
         input {
             width: 90%;
             padding: 10px;
@@ -26,6 +29,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+
         button {
             padding: 10px 20px;
             background: #007bff;
@@ -35,9 +39,11 @@
             cursor: pointer;
             transition: background 0.3s;
         }
+
         button:hover {
             background: #0056b3;
         }
+
         .output {
             background: #eef;
             padding: 10px;
@@ -47,6 +53,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>CORS Proxy URL Generator</h1>
@@ -64,10 +71,15 @@
                 alert("Please enter a valid API URL");
                 return;
             }
-            
-            const proxyUrl = `https://proxy.sewakgautam.com.np/api/proxy?url=${apiUrl}`;
+
+            // Encode the API URL to handle query parameters properly
+            const encodedUrl = encodeURIComponent(apiUrl);
+            const proxyUrl = `https://proxy.sewakgautam.com.np/api/proxy?url=${encodedUrl}`;
+
             document.getElementById("proxyUrl").textContent = proxyUrl;
         }
     </script>
+
 </body>
+
 </html>

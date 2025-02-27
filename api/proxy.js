@@ -1,24 +1,29 @@
 export default async function handler(req, res) {
-  // CORS Headers
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins (or restrict to your domain)
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle preflight requests
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // Get the target URL from query parameters
-  const { url } = req.query;
+  const { url, ...queryParams } = req.query;
 
   if (!url) {
     return res.status(400).json({ error: "Missing 'url' parameter" });
   }
 
   try {
-    // Fetch data from the target API
-    const response = await fetch(decodeURIComponent(url), {
+    // Decode once to ensure proper URL reconstruction
+    const decodedUrl = decodeURIComponent(url);
+
+    // Reconstruct full target URL with additional query parameters
+    const queryString = new URLSearchParams(queryParams).toString();
+    const finalUrl = queryString ? `${decodedUrl}?${queryString}` : decodedUrl;
+
+    console.log("Fetching:", finalUrl); // Debugging: Ensure full URL is correct
+
+    const response = await fetch(finalUrl, {
       headers: {
         "User-Agent": "Mozilla/5.0",
         Accept: "application/json",
@@ -29,9 +34,16 @@ export default async function handler(req, res) {
       throw new Error(`HTTP Error: ${response.status}`);
     }
 
-    // Return JSON response
-    const data = await response.json();
-    res.status(200).json(data);
+    // Stream response properly (prevent truncation)
+    const data = await response.text(); 
+    try {
+      const jsonData = JSON.parse(data);
+      res.status(200).json(jsonData);
+    } catch (jsonError) {
+      console.error("JSON Parse Error:", jsonError);
+      res.status(200).send(data); // Send raw text if JSON parsing fails
+    }
+
   } catch (error) {
     console.error("Error fetching URL:", error.message);
     res.status(500).json({ error: "Failed to fetch the requested URL" });
