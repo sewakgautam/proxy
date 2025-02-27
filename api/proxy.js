@@ -1,3 +1,5 @@
+import https from "https";
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -14,38 +16,41 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Decode once to ensure proper URL reconstruction
+    // Decode URL (single decode to avoid double-encoding issues)
     const decodedUrl = decodeURIComponent(url);
+    
+    // Append query parameters correctly
+    const urlObj = new URL(decodedUrl);
+    Object.entries(queryParams).forEach(([key, value]) => {
+      urlObj.searchParams.append(key, value);
+    });
 
-    // Reconstruct full target URL with additional query parameters
-    const queryString = new URLSearchParams(queryParams).toString();
-    const finalUrl = queryString ? `${decodedUrl}?${queryString}` : decodedUrl;
-
-    console.log("Fetching:", finalUrl); // Debugging: Ensure full URL is correct
+    const finalUrl = urlObj.toString();
+    console.log("Fetching URL:", finalUrl);
 
     const response = await fetch(finalUrl, {
       headers: {
         "User-Agent": "Mozilla/5.0",
         Accept: "application/json",
       },
+      redirect: "follow", // Follow redirects
+      agent: new https.Agent({ rejectUnauthorized: false }), // Allow HTTPS
     });
 
     if (!response.ok) {
       throw new Error(`HTTP Error: ${response.status}`);
     }
 
-    // Stream response properly (prevent truncation)
-    const data = await response.text(); 
+    const data = await response.text();
+
     try {
-      const jsonData = JSON.parse(data);
-      res.status(200).json(jsonData);
-    } catch (jsonError) {
-      console.error("JSON Parse Error:", jsonError);
-      res.status(200).send(data); // Send raw text if JSON parsing fails
+      res.status(200).json(JSON.parse(data));
+    } catch {
+      res.status(200).send(data); // Send raw text if JSON fails
     }
 
   } catch (error) {
-    console.error("Error fetching URL:", error.message);
-    res.status(500).json({ error: "Failed to fetch the requested URL" });
+    console.error("Proxy Error:", error.message);
+    res.status(500).json({ error: "Failed to fetch the requested URL", details: error.message });
   }
 }
