@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORS Proxy Generator</title>
+    <title>CORS Proxy URL Generator</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -51,6 +51,10 @@
             margin-top: 10px;
             word-wrap: break-word;
         }
+
+        .error {
+            color: red;
+        }
     </style>
 </head>
 
@@ -62,13 +66,25 @@
         <button onclick="generateProxyUrl()">Generate Proxy URL</button>
         <h3>Proxied URL:</h3>
         <div class="output" id="proxyUrl">Your proxied URL will appear here</div>
+        <div class="error" id="error"></div>
     </div>
 
     <script>
         function generateProxyUrl() {
             const apiUrl = document.getElementById("apiUrl").value.trim();
+            const errorDiv = document.getElementById("error");
+            errorDiv.textContent = ''; // Clear previous errors
+
+            // Basic validation for URL format
+            try {
+                new URL(apiUrl); // If invalid, this will throw an error
+            } catch (e) {
+                errorDiv.textContent = "Please enter a valid URL.";
+                return;
+            }
+
             if (!apiUrl) {
-                alert("Please enter a valid API URL");
+                errorDiv.textContent = "Please enter a valid API URL.";
                 return;
             }
 
